@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet, Image} from 'react-native';
+import {View, Text, StyleSheet, Image, BackHandler} from 'react-native';
 import React from 'react';
 import Footer from '../componets/Footer';
 import Button from '../componets/Button';
@@ -8,6 +8,21 @@ import {userLogout} from '../../store/Actions/AccountActions';
 
 const HomeScreen = props => {
   //disable back button
+
+  React.useEffect(() => {
+    const backAction = () => {
+      if (props.account_info.firstName != '') {
+        return true;
+      } else {
+        return false;
+      }
+    };
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+    return () => backHandler.remove();
+  }, []);
 
   const handleLogout = () => {
     props.userLogout();

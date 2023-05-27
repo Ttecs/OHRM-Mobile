@@ -16,7 +16,6 @@ export function handleLogin(userName, password, token, callback) {
     },
   )
     .then(function (response) {
-      console.log('response ############', response.data.error.text);
       if (response.status == 200) callback(response.data.user, true, null);
       else callback(null, false, response.data.error.text);
     })

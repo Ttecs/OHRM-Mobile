@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  SafeAreaView,
 } from 'react-native';
 import React from 'react';
 import Footer from '../componets/Footer';
@@ -14,23 +15,28 @@ import {handleLogin} from '../../api/LoginApis';
 import {bindActionCreators} from 'redux';
 import {connect} from 'react-redux';
 import {userLogin} from '../../store/Actions/AccountActions';
+import Lottie from 'lottie-react-native';
 
 const LoginScreen = props => {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [showLoading, setShowLoading] = React.useState(false);
 
   const callback = (data, flag, error) => {
     if (flag == true) {
       props.getUserLogin(data);
+      setShowLoading(false);
       props.navigation.navigate('home');
     } else {
       console.log('###### reroor########', error);
+      setShowLoading(false);
       Alert.alert('Login Failed', error);
     }
   };
 
   const handleSubmit = () => {
     if (username != '' && password != '') {
+      setShowLoading(true);
       handleLogin(username, password, props.account_info.token, callback);
     } else {
       Alert.alert('Login Failed', 'Please enter username and password');
@@ -38,7 +44,17 @@ const LoginScreen = props => {
   };
 
   return (
-    <View style={style.container}>
+    <SafeAreaView style={style.container}>
+      {showLoading ? (
+        <View style={style.loadingContainer}>
+          <Lottie
+            style={style.loading}
+            source={require('../../assets/images/145114-loader.json')}
+            autoPlay
+            loop
+          />
+        </View>
+      ) : null}
       <View style={style.loginContainer}>
         <Text style={style.loginText}>Get Start ! Login Now</Text>
         <View style={style.inputContainer}>
@@ -58,6 +74,7 @@ const LoginScreen = props => {
             onChangeText={text => setPassword(text)}
           />
         </View>
+
         <Button
           onPress={() => {
             handleSubmit();
@@ -67,7 +84,13 @@ const LoginScreen = props => {
 
         <Text style={style.orText}>-- or --</Text>
         <View style={style.instagramContainer}>
-          <TouchableOpacity onPress={() => insRef.current.show()}>
+          <TouchableOpacity
+            onPress={() =>
+              Alert.alert(
+                'Instagram',
+                'What went wrong:A problem occurred evaluating project :react-native-community_cookies : need time to fix this :-(',
+              )
+            }>
             <Image
               style={style.instagramImage}
               source={require('../../assets/images/icons8-instagram-400.png')}
@@ -78,7 +101,7 @@ const LoginScreen = props => {
           <Footer />
         </View>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -93,6 +116,10 @@ const mapDispatchToProps = dispatch => ({
 export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
 
 const style = StyleSheet.create({
+  loading: {
+    width: 100,
+    height: 100,
+  },
   container: {
     flex: 1,
 
@@ -198,5 +225,15 @@ const style = StyleSheet.create({
     color: 'grey',
     marginTop: 2,
     textAlign: 'center',
+  },
+  loadingContainer: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#fff',
+    opacity: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1,
   },
 });
