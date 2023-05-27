@@ -1,11 +1,23 @@
 import {View, Text, StyleSheet, Image} from 'react-native';
 import React from 'react';
+import {getToken} from '../../api/LoginApis';
+import {saveBearerToken} from '../../store/Actions/AccountActions';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
 
-const SplashScreen = ({navigation}) => {
+const SplashScreen = props => {
+  const callback = (data, flag, error) => {
+    if (flag == true) {
+      console.log('######### Bear token ############', data);
+      props.setBearerToken(data);
+    }
+  };
+
   //####################### set timeout for splash#######################
   React.useEffect(() => {
+    getToken(callback);
     setTimeout(() => {
-      navigation.navigate('Login');
+      props.navigation.navigate('Login');
     }, 3000);
   }, []);
   //####################### set timeout for splash#######################
@@ -20,7 +32,13 @@ const SplashScreen = ({navigation}) => {
   );
 };
 
-export default SplashScreen;
+const mapStateToProps = state => ({});
+
+const mapDispatchToProps = dispatch => ({
+  setBearerToken: bindActionCreators(saveBearerToken, dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(SplashScreen);
 
 const styles = StyleSheet.create({
   container: {

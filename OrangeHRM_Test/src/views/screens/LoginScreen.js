@@ -5,39 +5,38 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import React from 'react';
 import Footer from '../componets/Footer';
 import Button from '../componets/Button';
 import {handleLogin} from '../../api/LoginApis';
+import {bindActionCreators} from 'redux';
+import {connect} from 'react-redux';
+import {userLogin} from '../../store/Actions/AccountActions';
 
-const LoginScreen = ({navigation}) => {
-  const onClear = () => {};
+const LoginScreen = props => {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
 
-  const [isFocused, setIsFocused] = React.useState(false);
-  const [isFocused2, setIsFocused2] = React.useState(false);
-
-  const handleFocus = () => setIsFocused(true);
-
-  const callback = data => {
-    console.log(data);
+  const callback = (data, flag, error) => {
+    if (flag == true) {
+      props.getUserLogin(data);
+      props.navigation.navigate('home');
+    } else {
+      console.log('###### reroor########', error);
+      Alert.alert('Login Failed', error);
+    }
   };
 
   const handleSubmit = () => {
     if (username != '' && password != '') {
-      handleLogin(username, password, callback);
+      handleLogin(username, password, props.account_info.token, callback);
+    } else {
+      Alert.alert('Login Failed', 'Please enter username and password');
     }
-    // if (true) {
-    //   console.log('success');
-    //   navigation.navigate('home');
-    // } else {
-    //   console.log('fail');
-    // }
   };
-  console.log(username);
-  console.log(password);
+
   return (
     <View style={style.container}>
       <View style={style.loginContainer}>
@@ -83,7 +82,15 @@ const LoginScreen = ({navigation}) => {
   );
 };
 
-export default LoginScreen;
+const mapStateToProps = state => ({
+  account_info: state.account_info,
+});
+
+const mapDispatchToProps = dispatch => ({
+  getUserLogin: bindActionCreators(userLogin, dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(LoginScreen);
 
 const style = StyleSheet.create({
   container: {

@@ -2,8 +2,17 @@ import {View, Text, StyleSheet, Image} from 'react-native';
 import React from 'react';
 import Footer from '../componets/Footer';
 import Button from '../componets/Button';
+import {connect} from 'react-redux';
+import {bindActionCreators} from 'redux';
+import {userLogout} from '../../store/Actions/AccountActions';
 
-const HomeScreen = () => {
+const HomeScreen = props => {
+  //disable back button
+
+  const handleLogout = () => {
+    props.userLogout();
+    props.navigation.navigate('Login');
+  };
   return (
     <View style={styles.container}>
       <View style={styles.profileContainer}>
@@ -12,8 +21,8 @@ const HomeScreen = () => {
           source={require('../../assets/images/playstore.png')}
         />
         <View style={styles.textContainer}>
-          <Text style={styles.text}>Name : ITFAC</Text>
-          <Text style={styles.text}>Email : email#email.com </Text>
+          <Text style={styles.text}>Name : {props.account_info.firstName}</Text>
+          <Text style={styles.text}>Role : {props.account_info.userRole} </Text>
         </View>
         <View style={styles.textContainer2}>
           <Text style={styles.text2}>
@@ -23,7 +32,12 @@ const HomeScreen = () => {
         </View>
 
         <View style={styles.LogoutContainer3}>
-          <Button text="Logout" />
+          <Button
+            text="Logout"
+            onPress={() => {
+              handleLogout();
+            }}
+          />
         </View>
       </View>
       <Footer />
@@ -31,7 +45,16 @@ const HomeScreen = () => {
   );
 };
 
-export default HomeScreen;
+const mapStateToProps = state => ({
+  account_info: state.account_info,
+});
+
+const mapDispatchToProps = dispatch => ({
+  userLogout: bindActionCreators(userLogout, dispatch),
+  //  setBearerToken: bindActionCreators(saveBearerToken, dispatch),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
 
 const styles = StyleSheet.create({
   container: {
